@@ -45,7 +45,4 @@ public class Filme {
         return "Id: " + id + " Nome: " + nome + " Diretor: " + diretor;
     }
 
-    public String toConteudo() {
-        return nome + ":" + diretor;
-    }
 }

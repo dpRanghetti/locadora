@@ -110,6 +110,7 @@ public class FilmeForm extends JFrame {
 
     private void selecionarFilme(){
         var filme = listaDeFilmes.getSelectedValue();
+        if (filme == null) return;
         campoNomeFilme.setText(filme.getNome());
         campoDiretor.setText(filme.getDiretor());
         campoId.setText(filme.getId().toString());
