@@ -13,7 +13,7 @@ public class FilmeDao {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/javadb?useTimezone=true&serverTimezone=UTC", "root", "root");
+                    "jdbc:mysql://localhost:3306/javadb?useTimezone=true&serverTimezone=UTC", "root", "");
         } catch (Exception e) {
             throw new SQLException(e.getMessage());
         }
@@ -23,26 +23,35 @@ public class FilmeDao {
         return connection;
     }
 
-    public void inserir(Filme Filme) throws SQLException {
-        ResultSet rs = connection.prepareStatement("select max(idFilme) from Filme").executeQuery();
-        int id = 0;
-        while (rs.next()) {
-            id = rs.getInt(1) + 1;
-
-            String sql = "insert into Filme values(?,?)";
+    public void inserir(Filme filme) throws SQLException {
+            String sql = "insert into filme(nome,diretor) values(?,?)";
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, id);
-            ps.setString(2, Filme.getNome());
+            ps.setString(1, filme.getNome());
+            ps.setString(2, filme.getDiretor());
             ps.execute();
+    }
+
+    public List<Filme> listarTodos() throws SQLException {
+        List<Filme> filmes = new ArrayList<Filme>();
+
+        ResultSet rs = connection.prepareStatement("select * from filme").executeQuery();
+        while (rs.next()) {
+            filmes.add(new Filme(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("diretor")));
         }
         rs.close();
+
+        return filmes;
     }
 
     public void atualizar(Filme filme) throws SQLException {
-        String sql = "update Filme set nome = ? where idFilme = ?";
+        String sql = "update filme set nome = ?, diretor = ? where id = ?";
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setString(1, filme.getNome());
-        //ps.setInt(2, filme.getIdFilme());
+        ps.setString(2, filme.getDiretor());
+        ps.setInt(3, filme.getId());
         ps.execute();
     }
 
@@ -79,18 +88,6 @@ public class FilmeDao {
         while (rs.next()) {
             Filme Filme = new Filme(rs.getString("nome"), rs.getString("diretor"));
             Filmes.add(Filme);
-        }
-        rs.close();
-
-        return Filmes;
-    }
-
-    public List<Filme> listarTodos() throws SQLException {
-        List<Filme> Filmes = new ArrayList<Filme>();
-
-        ResultSet rs = connection.prepareStatement("select * from Filme").executeQuery();
-        while (rs.next()) {
-            Filmes.add(new Filme(rs.getString("nome"), rs.getString("diretor")));
         }
         rs.close();
 
